@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { FirebaseAppProvider } from "reactfire";
+import Loader from "./Modules/Loader/Loader";
 const firebaseConfig = {
   apiKey: "AIzaSyA0SfRaGwvI_iPMD5TQjdv0b34O9_fJWAk",
   authDomain: "quizapp-fdb5a.firebaseapp.com",
@@ -17,7 +18,7 @@ const firebaseConfig = {
 ReactDOM.render(
   <React.StrictMode>
     <FirebaseAppProvider firebaseConfig={firebaseConfig}>
-      <Suspense fallback={<h1>Loading...</h1>}>
+      <Suspense fallback={<Loader />}>
         <App />
       </Suspense>
     </FirebaseAppProvider>
