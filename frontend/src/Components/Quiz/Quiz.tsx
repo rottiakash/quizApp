@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useFirestore, useFirestoreDocData } from "reactfire";
 import styles from "./Quiz.module.css";
@@ -15,12 +15,19 @@ export interface Room {
   player2: string;
 }
 const Quiz: FC = () => {
-  const [clock, setClock] = useState<string>("--");
+  const [clock, setClock] = useState<number>(21);
+  const [startTimer, set] = useState<boolean>(false);
   const history = useHistory();
   const { id, qno } = useParams();
   const firestore = useFirestore();
   const roomRef = firestore.collection("rooms").doc(id);
   const room: Room = useFirestoreDocData(roomRef);
+  useEffect(() => {
+    if (startTimer)
+      if (clock > 0) {
+        setTimeout(() => setClock(clock - 1), 1000);
+      }
+  }, [clock, setClock, startTimer]);
   return (
     <div
       style={{
@@ -48,7 +55,12 @@ const Quiz: FC = () => {
         />
         <span className={styles.name}>Question {qno}</span>
       </div>
-      <Question topic={room.topic} question={room.questions[qno - 1]} />
+      <Question
+        topic={room.topic}
+        question={room.questions[qno - 1]}
+        set={set}
+        startTimer={startTimer}
+      />
       <div
         style={{
           display: "flex",
@@ -129,21 +141,24 @@ const Quiz: FC = () => {
 interface QuestionProps {
   topic: string;
   question: string;
+  set: any;
+  startTimer: boolean;
 }
 interface Question {
   correct: string;
   options: Array<string>;
   question: string;
 }
-const Question: FC<QuestionProps> = ({ topic, question }) => {
+const Question: FC<QuestionProps> = ({ topic, question, set, startTimer }) => {
   const firestore = useFirestore();
+  useEffect(() => set(true), [set, startTimer]);
   const topicRef = firestore
     .collection("topics")
     .doc(topic)
     .collection("questions")
     .doc(question);
   const data: Question = useFirestoreDocData(topicRef);
-  console.log(data);
+
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
       <div

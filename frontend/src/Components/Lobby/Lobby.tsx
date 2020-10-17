@@ -49,7 +49,14 @@ const Lobby: FC = () => {
       {!room.player2 && (
         <span className={styles.subtext}>Waiting for Player</span>
       )}
-      {room.player2 && <button className={styles.btngrad}>Ready!</button>}
+      {room.player2 && (
+        <button
+          className={styles.btngrad}
+          onClick={() => history.push(`/quiz/${id}/1`)}
+        >
+          Ready!
+        </button>
+      )}
       <div
         style={{
           display: "flex",
