@@ -1,0 +1,68 @@
+.name {
+  padding: 10px;
+  background-color: red;
+  font-size: 2.5rem;
+  background-image: linear-gradient(45deg, #f3ec78, #af4261);
+  background-size: 100%;
+  background-repeat: repeat;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtext {
+  padding: 10px;
+  background-color: red;
+  font-size: 2rem;
+  background-image: linear-gradient(45deg, #f3ec78, #af4261);
+  background-size: 100%;
+  background-repeat: repeat;
+  background-clip: text;
+  color: transparent;
+}
+
+.score {
+  background-color: red;
+  font-size: 2.2rem;
+  background-image: linear-gradient(45deg, #f3ec78, #af4261);
+  background-size: 100%;
+  background-repeat: repeat;
+  background-clip: text;
+  color: transparent;
+}
+
+.clock {
+  background-clip: padding-box;
+  border-radius: 50%;
+}
+.clock::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+
+  border-radius: inherit; /* !importanté */
+  background: linear-gradient(to right, red, orange);
+}
+.btngrad {
+  background-image: linear-gradient(45deg, #f3ec78, #af4261);
+}
+.btngrad {
+  margin: 10px;
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  border-radius: 10px;
+  display: block;
+}
+
+.btngrad:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}

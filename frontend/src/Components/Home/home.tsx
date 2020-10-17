@@ -86,7 +86,7 @@ const HomePage: FC<HomeProps> = () => {
                 var config = {
                   method: "post",
                   url:
-                    "http://localhost:5001/quizapp-fdb5a/us-central1/logic/joinroom",
+                    "https://us-central1-quizapp-fdb5a.cloudfunctions.net/logic/joinroom",
                   headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -134,7 +134,7 @@ const Topics: FC = () => {
               var config = {
                 method: "post",
                 url:
-                  "http://localhost:5001/quizapp-fdb5a/us-central1/logic/createroom",
+                  "https://us-central1-quizapp-fdb5a.cloudfunctions.net/logic/createroom",
                 headers: {
                   Authorization: `Bearer ${token}`,
                   "Content-Type": "application/x-www-form-urlencoded",

@@ -103,6 +103,8 @@ app.post("/createroom", async (req: any, res) => {
       player1: uid,
       player1_url: photourl,
       player1_name: name,
+      player1_score: 0,
+      player2_score: 0,
       questions,
     });
     console.log("Created Room", roomid);
