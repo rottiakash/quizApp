@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useAuth, useFirestore, useFirestoreDocData } from "reactfire";
+import Waiter from "../../Modules/Waiter/Waiter";
 import styles from "./Quiz.module.css";
 const axios = require("axios").default;
 var qs = require("qs");
@@ -53,27 +54,119 @@ function timeout(delay: number) {
 }
 
 const Quiz: FC = () => {
+  const resetTimer = () => setClock(21);
+  const regularOption = {
+    display: "flex",
+    backgroundColor: "teal",
+    padding: "20px",
+    borderRadius: "16px",
+    justifyContent: "center",
+    cursor: "pointer",
+  };
+  const validateOption = {
+    display: "flex",
+    backgroundColor: "orange",
+    padding: "20px",
+    borderRadius: "16px",
+    justifyContent: "center",
+    cursor: "pointer",
+  };
+  const wrongOption = {
+    display: "flex",
+    backgroundColor: "tomato",
+    padding: "20px",
+    borderRadius: "16px",
+    justifyContent: "center",
+    cursor: "pointer",
+  };
+  const correctOption = {
+    display: "flex",
+    backgroundColor: "lime",
+    padding: "20px",
+    borderRadius: "16px",
+    justifyContent: "center",
+    cursor: "pointer",
+  };
+  var player: number;
   const [clock, setClock] = useState<number>(21);
-  const [startTimer, set] = useState<boolean>(false);
+  const [optionStyle, setOptionStyle] = useState({
+    option1: regularOption,
+    option2: regularOption,
+    option3: regularOption,
+    option4: regularOption,
+  });
   const history = useHistory();
   const { id, qno } = useParams();
   const auth = useAuth();
   const firestore = useFirestore();
   const roomRef = firestore.collection("rooms").doc(id);
   const room: Room = useFirestoreDocData(roomRef);
+
+  if (auth.currentUser?.uid === room.player1) {
+    player = 1;
+  } else player = 2;
+  if (player)
+    firestore
+      .collection("rooms")
+      .doc(id)
+      .update({ [`p${player}_q${qno}`]: true });
+  var other;
+  switch (qno) {
+    case "1":
+      console.log("Here");
+      if (player === 1) other = room.p2_q1;
+      else other = room.p1_q1;
+      break;
+    case "2":
+      if (player === 1) other = room.p2_q2;
+      else other = room.p1_q2;
+      break;
+    case "3":
+      if (player === 1) other = room.p2_q3;
+      else other = room.p1_q3;
+      break;
+    case "4":
+      if (player === 1) other = room.p2_q4;
+      else other = room.p1_q4;
+      break;
+    case "5":
+      if (player === 1) other = room.p2_q5;
+      else other = room.p1_q5;
+      break;
+    case "6":
+      if (player === 1) other = room.p2_q6;
+      else other = room.p1_q6;
+      break;
+    case "7":
+      if (player === 1) other = room.p2_q7;
+      else other = room.p1_q7;
+      break;
+    default:
+      break;
+  }
+  console.log(other);
   useInterval(() => {
-    if (startTimer) if (clock === 0) return;
+    if (clock === 0) return;
     setClock(clock - 1);
   }, 1000);
   var token: string;
   auth.currentUser?.getIdToken().then((idToken) => (token = idToken));
-  const validate = async (answer: string) => {
+  const validate = async (answer: string, button: number) => {
+    if (button === 1)
+      setOptionStyle({ ...optionStyle, option1: validateOption });
+    else if (button === 2)
+      setOptionStyle({ ...optionStyle, option2: validateOption });
+    else if (button === 3)
+      setOptionStyle({ ...optionStyle, option3: validateOption });
+    else if (button === 4)
+      setOptionStyle({ ...optionStyle, option4: validateOption });
     var payload = qs.stringify({
       room: id,
       question: room.questions[qno - 1],
       answer,
       timer: clock,
     });
+    setClock(0);
     console.log(payload);
     var config = {
       method: "post",
@@ -87,130 +180,167 @@ const Quiz: FC = () => {
     };
     var response = await axios(config);
     console.log(response);
-    setClock(21);
-    set(false);
+
+    if (response.data === true) {
+      if (button === 1)
+        setOptionStyle({ ...optionStyle, option1: correctOption });
+      else if (button === 2)
+        setOptionStyle({ ...optionStyle, option2: correctOption });
+      else if (button === 3)
+        setOptionStyle({ ...optionStyle, option3: correctOption });
+      else if (button === 4)
+        setOptionStyle({ ...optionStyle, option4: correctOption });
+    } else {
+      if (button === 1)
+        setOptionStyle({ ...optionStyle, option1: wrongOption });
+      else if (button === 2)
+        setOptionStyle({ ...optionStyle, option2: wrongOption });
+      else if (button === 3)
+        setOptionStyle({ ...optionStyle, option3: wrongOption });
+      else if (button === 4)
+        setOptionStyle({ ...optionStyle, option4: wrongOption });
+    }
+    await timeout(3000);
+    setOptionStyle({
+      option1: regularOption,
+      option2: regularOption,
+      option3: regularOption,
+      option4: regularOption,
+    });
+
     if (parseInt(qno) < 7) history.push(`/quiz/${id}/${parseInt(qno) + 1}`);
     else window.alert("Quiz Done.....Next route to be implemented");
+
+    setClock(21);
   };
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: "#100e17",
-        justifyContent: "space-between",
-        alignItems: "center",
-        height: "100vh",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <img
-          src="https://cdn2.iconfinder.com/data/icons/gradient-purple-navigation-and-transactional-for-w/40/back-purp-512.png"
-          alt="back"
-          onClick={() => history.push("/")}
-          style={{
-            width: "50px",
-            height: "50px",
-            marginLeft: "10px",
-            marginTop: "10px",
-            paddingTop: "5px",
-            cursor: "pointer",
-          }}
-        />
-        <span className={styles.name}>Question {qno}</span>
-      </div>
-      <Question
-        topic={room.topic}
-        question={room.questions[qno - 1]}
-        set={set}
-        startTimer={startTimer}
-        validate={validate}
-        setClock={setClock}
-      />
+  if (!other) return <Waiter />;
+  else
+    return (
       <div
         style={{
           display: "flex",
-          width: "100vw",
+          flexDirection: "column",
+          backgroundColor: "#100e17",
           justifyContent: "space-between",
+          alignItems: "center",
+          height: "100vh",
         }}
       >
-        <div style={{ color: "white", padding: "20px" }}>
-          <div style={{ display: "flex" }}>
-            <img
-              src={room.player1_url}
-              alt="Profile"
-              style={{
-                width: "50px",
-                height: "50px",
-                borderRadius: "50%",
-                display: "block",
-              }}
-            />
-            <span
-              className={styles.score}
-              style={{
-                marginLeft: "5px",
-                paddingTop: "10px",
-              }}
-            >
-              {room.player1_score}
-            </span>
-          </div>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <img
+            src="https://cdn2.iconfinder.com/data/icons/gradient-purple-navigation-and-transactional-for-w/40/back-purp-512.png"
+            alt="back"
+            onClick={() => history.push("/")}
+            style={{
+              width: "50px",
+              height: "50px",
+              marginLeft: "10px",
+              marginTop: "10px",
+              paddingTop: "5px",
+              cursor: "pointer",
+            }}
+          />
+          <span className={styles.name}>Question {qno}</span>
         </div>
-        <span
-          style={{
-            marginRight: "5px",
-            paddingTop: "10px",
-            height: "50px",
-            width: "50px",
-            padding: "4px",
-            border: "5px solid white",
 
-            textAlign: "center",
+        <Question
+          topic={room.topic}
+          question={room.questions[qno - 1]}
+          validate={validate}
+          setClock={setClock}
+          optionStyle={optionStyle}
+          resetTimer={resetTimer}
+        />
+
+        <div
+          style={{
+            display: "flex",
+            width: "100vw",
+            justifyContent: "space-between",
           }}
-          className={styles.clock}
         >
-          <span className={styles.score}>{clock}</span>
-        </span>
-        <div style={{ color: "white", padding: "20px" }}>
-          <div style={{ display: "flex" }}>
-            <span
-              className={styles.score}
-              style={{
-                marginRight: "5px",
-                paddingTop: "10px",
-              }}
-            >
-              {room.player2_score}
-            </span>
-            <img
-              src={
-                room.player2
-                  ? room.player2_url
-                  : "https://media.istockphoto.com/vectors/waiting-icon-vector-sign-and-symbol-isolated-on-white-background-vector-id1029720470?k=6&m=1029720470&s=170667a&w=0&h=Jj71N5y7TwYnqCblQZnKZTCF5zOjknUWEchBRJza_wc="
-              }
-              alt="Profile"
-              style={{
-                width: "50px",
-                height: "50px",
-                borderRadius: "50%",
-                display: "block",
-              }}
-            />
+          <div style={{ color: "white", padding: "20px" }}>
+            <div style={{ display: "flex" }}>
+              <img
+                src={room.player1_url}
+                alt="Profile"
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "50%",
+                  display: "block",
+                }}
+              />
+              <span
+                className={styles.score}
+                style={{
+                  marginLeft: "5px",
+                  paddingTop: "10px",
+                }}
+              >
+                {room.player1_score}
+              </span>
+            </div>
+          </div>
+          <span
+            style={{
+              marginRight: "5px",
+              paddingTop: "10px",
+              height: "50px",
+              width: "50px",
+              padding: "4px",
+              border: "5px solid white",
+
+              textAlign: "center",
+            }}
+            className={styles.clock}
+          >
+            <span className={styles.score}>{clock}</span>
+          </span>
+          <div style={{ color: "white", padding: "20px" }}>
+            <div style={{ display: "flex" }}>
+              <span
+                className={styles.score}
+                style={{
+                  marginRight: "5px",
+                  paddingTop: "10px",
+                }}
+              >
+                {room.player2_score}
+              </span>
+              <img
+                src={
+                  room.player2
+                    ? room.player2_url
+                    : "https://media.istockphoto.com/vectors/waiting-icon-vector-sign-and-symbol-isolated-on-white-background-vector-id1029720470?k=6&m=1029720470&s=170667a&w=0&h=Jj71N5y7TwYnqCblQZnKZTCF5zOjknUWEchBRJza_wc="
+                }
+                alt="Profile"
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "50%",
+                  display: "block",
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
 };
 
 interface QuestionProps {
   topic: string;
   question: string;
-  set: any;
-  startTimer: boolean;
+  resetTimer: any;
   setClock: any;
   validate: any;
+  optionStyle: {
+    option1: any;
+    option2: any;
+    option3: any;
+    option4: any;
+  };
 }
 interface Question {
   correct: string;
@@ -220,15 +350,19 @@ interface Question {
 const Question: FC<QuestionProps> = ({
   topic,
   question,
-  set,
-  startTimer,
+  resetTimer,
   setClock,
   validate,
+  optionStyle,
 }) => {
+  const [first, setFirst] = useState(true);
   const firestore = useFirestore();
   useEffect(() => {
-    set(true);
-  }, [set, startTimer]);
+    if (first) {
+      resetTimer();
+      setFirst(false);
+    }
+  }, [first, resetTimer]);
   const topicRef = firestore
     .collection("topics")
     .doc(topic)
@@ -262,54 +396,26 @@ const Question: FC<QuestionProps> = ({
         }}
       >
         <div
-          onClick={() => validate(data.options[0])}
-          style={{
-            display: "flex",
-            backgroundColor: "teal",
-            padding: "20px",
-            borderRadius: "16px",
-            justifyContent: "center",
-            cursor: "pointer",
-          }}
+          onClick={() => validate(data.options[0], 1)}
+          style={optionStyle.option1}
         >
           {data.options[0]}
         </div>
         <div
-          onClick={() => validate(data.options[1])}
-          style={{
-            display: "flex",
-            backgroundColor: "teal",
-            padding: "20px",
-            justifyContent: "center",
-            borderRadius: "16px",
-            cursor: "pointer",
-          }}
+          onClick={() => validate(data.options[1], 2)}
+          style={optionStyle.option2}
         >
           {data.options[1]}
         </div>
         <div
-          onClick={() => validate(data.options[2])}
-          style={{
-            display: "flex",
-            backgroundColor: "teal",
-            padding: "20px",
-            justifyContent: "center",
-            borderRadius: "16px",
-            cursor: "pointer",
-          }}
+          onClick={() => validate(data.options[2], 3)}
+          style={optionStyle.option3}
         >
           {data.options[2]}
         </div>
         <div
-          onClick={() => validate(data.options[3])}
-          style={{
-            display: "flex",
-            backgroundColor: "teal",
-            padding: "20px",
-            justifyContent: "center",
-            borderRadius: "16px",
-            cursor: "pointer",
-          }}
+          onClick={() => validate(data.options[3], 4)}
+          style={optionStyle.option4}
         >
           {data.options[3]}
         </div>
