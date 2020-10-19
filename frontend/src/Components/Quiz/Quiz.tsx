@@ -209,7 +209,7 @@ const Quiz: FC = () => {
     });
 
     if (parseInt(qno) < 7) history.push(`/quiz/${id}/${parseInt(qno) + 1}`);
-    else window.alert("Quiz Done.....Next route to be implemented");
+    else history.push(`/winner/${id}`);
 
     setClock(21);
   };

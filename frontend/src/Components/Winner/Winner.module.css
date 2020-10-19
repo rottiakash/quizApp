@@ -1,0 +1,29 @@
+.text {
+  background-image: linear-gradient(45deg, #f3ec78, #af4261);
+  background-size: 100%;
+  background-repeat: repeat;
+  background-clip: text;
+  color: transparent;
+  font-size: 3rem;
+}
+
+.btngrad {
+  background-image: linear-gradient(45deg, #f3ec78, #af4261);
+}
+.btngrad {
+  margin: 10px;
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  border-radius: 10px;
+  display: block;
+}
+
+.btngrad:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
