@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { useFirestore, useFirestoreDocData } from "reactfire";
+import { useAuth, useFirestore, useFirestoreDocData } from "reactfire";
 import styles from "./Winner.module.css";
 export interface Room {
   questions: Array<string>;
@@ -25,16 +25,28 @@ export interface Room {
   p2_q5: boolean;
   p2_q6: boolean;
   p2_q7: boolean;
+  p1_w: boolean;
+  p2_w: boolean;
   topic: string;
   player2: string;
 }
 
 const Winner: FC = () => {
+  var player;
   const firestore = useFirestore();
   const { id } = useParams();
   const roomRef = firestore.collection("rooms").doc(id);
   const room: Room = useFirestoreDocData(roomRef);
   const history = useHistory();
+  const auth = useAuth();
+  if (auth.currentUser?.uid === room.player1) {
+    player = 1;
+  } else player = 2;
+  if (player)
+    firestore
+      .collection("rooms")
+      .doc(id)
+      .update({ [`p${player}_w`]: true });
   const getWinner = () => {
     var winner;
     if (
@@ -51,7 +63,9 @@ const Winner: FC = () => {
       room.p1_q6 === true &&
       room.p2_q6 &&
       room.p1_q7 === true &&
-      room.p2_q7
+      room.p2_q7 &&
+      room.p1_w &&
+      room.p2_w
     ) {
       if (room.player1_score > room.player2_score)
         winner = { name: room.player1_name, image: room.player1_url };
