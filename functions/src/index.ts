@@ -60,14 +60,19 @@ const fireAuth = async (req: any, res: any, next: any) => {
 
 app.use(fireAuth);
 
-app.post("/validate", async (req, res) => {
-  const topic = req.body.topic;
+app.post("/validate", async (req: any, res) => {
+  const room = req.body.room;
+  const roomRef = admin.firestore().collection("rooms").doc(room);
+  const roomGet = await roomRef.get();
+  const roomData = roomGet.data();
   const question = req.body.question;
   const ans = req.body.answer;
+  const timer = req.body.timer;
+  const uid = req.uid;
   const correctRef = await admin
     .firestore()
     .collection("topics")
-    .doc(topic)
+    .doc(roomData!.topic)
     .collection("questions")
     .doc(question)
     .get();
@@ -76,8 +81,17 @@ app.post("/validate", async (req, res) => {
     res.send("No such document!");
   } else {
     const correct = correctRef.data()!.correct;
-    if (correct == ans) res.send(true);
-    else res.send(false);
+    if (correct == ans) {
+      if (uid == roomData!.player1)
+        await roomRef.update({
+          player1_score: parseInt(roomData!.player1_score) + parseInt(timer),
+        });
+      else
+        await roomRef.update({
+          player2_score: parseInt(roomData!.player2_score) + parseInt(timer),
+        });
+      res.send(true);
+    } else res.send(false);
   }
 });
 

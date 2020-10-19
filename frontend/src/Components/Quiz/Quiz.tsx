@@ -1,7 +1,9 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { useFirestore, useFirestoreDocData } from "reactfire";
+import { useAuth, useFirestore, useFirestoreDocData } from "reactfire";
 import styles from "./Quiz.module.css";
+const axios = require("axios").default;
+var qs = require("qs");
 export interface Room {
   questions: Array<string>;
   player1: string;
@@ -11,23 +13,85 @@ export interface Room {
   player2_name: string;
   player2_score: string;
   player1_score: string;
+  p1_q1: string;
+  p1_q2: string;
+  p1_q3: string;
+  p1_q4: string;
+  p1_q5: string;
+  p1_q6: string;
+  p1_q7: string;
+  p2_q1: string;
+  p2_q2: string;
+  p2_q3: string;
+  p2_q4: string;
+  p2_q5: string;
+  p2_q6: string;
+  p2_q7: string;
   topic: string;
   player2: string;
 }
+function useInterval(callback: any, delay: any) {
+  const savedCallback: React.MutableRefObject<any> = useRef();
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
+function timeout(delay: number) {
+  return new Promise((res) => setTimeout(res, delay));
+}
+
 const Quiz: FC = () => {
   const [clock, setClock] = useState<number>(21);
   const [startTimer, set] = useState<boolean>(false);
   const history = useHistory();
   const { id, qno } = useParams();
+  const auth = useAuth();
   const firestore = useFirestore();
   const roomRef = firestore.collection("rooms").doc(id);
   const room: Room = useFirestoreDocData(roomRef);
-  useEffect(() => {
-    if (startTimer)
-      if (clock > 0) {
-        setTimeout(() => setClock(clock - 1), 1000);
-      }
-  }, [clock, setClock, startTimer]);
+  useInterval(() => {
+    if (startTimer) if (clock === 0) return;
+    setClock(clock - 1);
+  }, 1000);
+  var token: string;
+  auth.currentUser?.getIdToken().then((idToken) => (token = idToken));
+  const validate = async (answer: string) => {
+    var payload = qs.stringify({
+      room: id,
+      question: room.questions[qno - 1],
+      answer,
+      timer: clock,
+    });
+    console.log(payload);
+    var config = {
+      method: "post",
+      url:
+        "https://us-central1-quizapp-fdb5a.cloudfunctions.net/logic/validate",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: payload,
+    };
+    var response = await axios(config);
+    console.log(response);
+    setClock(21);
+    set(false);
+    if (parseInt(qno) < 7) history.push(`/quiz/${id}/${parseInt(qno) + 1}`);
+    else window.alert("Quiz Done.....Next route to be implemented");
+  };
   return (
     <div
       style={{
@@ -60,6 +124,8 @@ const Quiz: FC = () => {
         question={room.questions[qno - 1]}
         set={set}
         startTimer={startTimer}
+        validate={validate}
+        setClock={setClock}
       />
       <div
         style={{
@@ -143,15 +209,26 @@ interface QuestionProps {
   question: string;
   set: any;
   startTimer: boolean;
+  setClock: any;
+  validate: any;
 }
 interface Question {
   correct: string;
   options: Array<string>;
   question: string;
 }
-const Question: FC<QuestionProps> = ({ topic, question, set, startTimer }) => {
+const Question: FC<QuestionProps> = ({
+  topic,
+  question,
+  set,
+  startTimer,
+  setClock,
+  validate,
+}) => {
   const firestore = useFirestore();
-  useEffect(() => set(true), [set, startTimer]);
+  useEffect(() => {
+    set(true);
+  }, [set, startTimer]);
   const topicRef = firestore
     .collection("topics")
     .doc(topic)
@@ -185,45 +262,53 @@ const Question: FC<QuestionProps> = ({ topic, question, set, startTimer }) => {
         }}
       >
         <div
+          onClick={() => validate(data.options[0])}
           style={{
             display: "flex",
             backgroundColor: "teal",
             padding: "20px",
             borderRadius: "16px",
             justifyContent: "center",
+            cursor: "pointer",
           }}
         >
           {data.options[0]}
         </div>
         <div
+          onClick={() => validate(data.options[1])}
           style={{
             display: "flex",
             backgroundColor: "teal",
             padding: "20px",
             justifyContent: "center",
             borderRadius: "16px",
+            cursor: "pointer",
           }}
         >
           {data.options[1]}
         </div>
         <div
+          onClick={() => validate(data.options[2])}
           style={{
             display: "flex",
             backgroundColor: "teal",
             padding: "20px",
             justifyContent: "center",
             borderRadius: "16px",
+            cursor: "pointer",
           }}
         >
           {data.options[2]}
         </div>
         <div
+          onClick={() => validate(data.options[3])}
           style={{
             display: "flex",
             backgroundColor: "teal",
             padding: "20px",
             justifyContent: "center",
             borderRadius: "16px",
+            cursor: "pointer",
           }}
         >
           {data.options[3]}
