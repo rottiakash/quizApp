@@ -55,6 +55,8 @@ function timeout(delay: number) {
 
 const Quiz: FC = () => {
   const resetTimer = () => setClock(21);
+
+  const [questionData, setQuestionData] = useState<Question>();
   const regularOption = {
     display: "flex",
     backgroundColor: "teal",
@@ -88,7 +90,7 @@ const Quiz: FC = () => {
     cursor: "pointer",
   };
   var player: number;
-  const [clock, setClock] = useState<number>(21);
+  const [clock, setClock] = useState<any>(21);
   const [optionStyle, setOptionStyle] = useState({
     option1: regularOption,
     option2: regularOption,
@@ -102,7 +104,22 @@ const Quiz: FC = () => {
   const firestore = useFirestore();
   const roomRef = firestore.collection("rooms").doc(id);
   const room: Room = useFirestoreDocData(roomRef);
-
+  const colorCorrectOption = () => {
+    switch (questionData?.options.indexOf(questionData.correct)) {
+      case 0:
+        setOptionStyle({ ...optionStyle, option1: correctOption });
+        break;
+      case 1:
+        setOptionStyle({ ...optionStyle, option2: correctOption });
+        break;
+      case 2:
+        setOptionStyle({ ...optionStyle, option3: correctOption });
+        break;
+      case 3:
+        setOptionStyle({ ...optionStyle, option4: correctOption });
+        break;
+    }
+  };
   if (auth.currentUser?.uid === room.player1) {
     player = 1;
   } else player = 2;
@@ -146,8 +163,23 @@ const Quiz: FC = () => {
       break;
   }
   console.log(other);
-  useInterval(() => {
-    if (clock === 0) return;
+  useInterval(async () => {
+    if (clock === 0) {
+      setClock("--");
+      colorCorrectOption();
+      await timeout(3000);
+      if (parseInt(qno) < 7) history.push(`/quiz/${id}/${parseInt(qno) + 1}`);
+      else history.push(`/winner/${id}`);
+      setOptionStyle({
+        option1: regularOption,
+        option2: regularOption,
+        option3: regularOption,
+        option4: regularOption,
+      });
+      setClock(21);
+      return;
+    }
+    if (clock === "--") return;
     setClock(clock - 1);
   }, 1000);
   var token: string;
@@ -168,7 +200,7 @@ const Quiz: FC = () => {
       answer,
       timer: clock,
     });
-    setClock(0);
+    setClock("--");
     console.log(payload);
     var config = {
       method: "post",
@@ -202,6 +234,8 @@ const Quiz: FC = () => {
       else if (button === 4)
         setOptionStyle({ ...optionStyle, option4: wrongOption });
     }
+    await timeout(1000);
+    colorCorrectOption();
     await timeout(3000);
     setOptionStyle({
       option1: regularOption,
@@ -253,6 +287,7 @@ const Quiz: FC = () => {
           optionStyle={optionStyle}
           resetTimer={resetTimer}
           disabled={disabled}
+          setQuestionData={setQuestionData}
         />
 
         <div
@@ -345,6 +380,7 @@ interface QuestionProps {
     option4: any;
   };
   disabled: boolean;
+  setQuestionData: any;
 }
 interface Question {
   correct: string;
@@ -358,6 +394,7 @@ const Question: FC<QuestionProps> = ({
   disabled,
   validate,
   optionStyle,
+  setQuestionData,
 }) => {
   const [first, setFirst] = useState(true);
   const firestore = useFirestore();
@@ -373,6 +410,9 @@ const Question: FC<QuestionProps> = ({
     .collection("questions")
     .doc(question);
   const data: Question = useFirestoreDocData(topicRef);
+  useEffect(() => {
+    if (data) setQuestionData(data);
+  });
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
