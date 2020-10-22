@@ -204,7 +204,7 @@ const Quiz: FC = () => {
     var config = {
       method: "post",
       url:
-        "https://us-central1-quizapp-fdb5a.cloudfunctions.net/logic/validate",
+        "https://asia-south1-quizapp-fdb5a.cloudfunctions.net/logic/validate",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/x-www-form-urlencoded",

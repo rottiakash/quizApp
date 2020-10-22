@@ -39,7 +39,7 @@ const TopicList: FC<TopicListProps> = ({ setIsActive }) => {
               var config = {
                 method: "post",
                 url:
-                  "https://us-central1-quizapp-fdb5a.cloudfunctions.net/logic/createroom",
+                  "https://asia-south1-quizapp-fdb5a.cloudfunctions.net/logic/createroom",
                 headers: {
                   Authorization: `Bearer ${token}`,
                   "Content-Type": "application/x-www-form-urlencoded",

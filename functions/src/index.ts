@@ -159,4 +159,4 @@ app.post("/joinroom", async (req: any, res) => {
     console.log("Error:", error);
   }
 });
-exports.logic = functions.https.onRequest(app);
+exports.logic = functions.region("asia-south1").https.onRequest(app);
