@@ -104,6 +104,10 @@ const Quiz: FC = () => {
   const firestore = useFirestore();
   const roomRef = firestore.collection("rooms").doc(id);
   const room: Room = useFirestoreDocData(roomRef);
+  if (!room.topic) {
+    window.alert("This room has been deleted");
+    history.push("/");
+  }
   const colorCorrectOption = () => {
     switch (questionData?.options.indexOf(questionData.correct)) {
       case 0:

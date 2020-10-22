@@ -38,6 +38,10 @@ const Winner: FC = () => {
   const roomRef = firestore.collection("rooms").doc(id);
   const room: Room = useFirestoreDocData(roomRef);
   const history = useHistory();
+  if (!room.topic) {
+    window.alert("This room has been deleted");
+    history.push("/");
+  }
   const auth = useAuth();
   if (auth.currentUser?.uid === room.player1) {
     player = 1;

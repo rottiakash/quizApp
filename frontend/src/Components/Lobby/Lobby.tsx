@@ -18,7 +18,10 @@ const Lobby: FC = () => {
   const firestore = useFirestore();
   const roomRef = firestore.collection("rooms").doc(id);
   const room: Room = useFirestoreDocData(roomRef);
-
+  if (!room.topic) {
+    window.alert("This room has been deleted");
+    history.push("/");
+  }
   return (
     <div
       style={{
