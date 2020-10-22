@@ -131,7 +131,6 @@ const Quiz: FC = () => {
   var other;
   switch (qno) {
     case "1":
-      console.log("Here");
       if (player === 1) other = room.p2_q1;
       else other = room.p1_q1;
       break;
@@ -162,7 +161,7 @@ const Quiz: FC = () => {
     default:
       break;
   }
-  console.log(other);
+
   useInterval(async () => {
     if (clock === 0) {
       setClock("--");
@@ -201,7 +200,7 @@ const Quiz: FC = () => {
       timer: clock,
     });
     setClock("--");
-    console.log(payload);
+
     var config = {
       method: "post",
       url:
@@ -213,7 +212,6 @@ const Quiz: FC = () => {
       data: payload,
     };
     var response = await axios(config);
-    console.log(response);
 
     if (response.data === true) {
       if (button === 1)

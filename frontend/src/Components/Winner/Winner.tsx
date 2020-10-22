@@ -75,7 +75,7 @@ const Winner: FC = () => {
     } else winner = { name: "Results not Declared" };
     return winner;
   };
-  console.log(getWinner());
+
   return (
     <div
       style={{
