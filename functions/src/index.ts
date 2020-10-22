@@ -138,7 +138,7 @@ app.post("/createroom", async (req: any, res) => {
     console.log("Created Room", roomid);
     res.send({ roomid });
   } catch (error) {
-    console.log("Error:", error);
+    console.log("Error");
   }
 });
 
@@ -156,7 +156,8 @@ app.post("/joinroom", async (req: any, res) => {
     console.log("Joinned Room", roomid);
     res.send({ roomid });
   } catch (error) {
-    console.log("Error:", error);
+    res.send("No such document!");
+    console.log("Error");
   }
 });
 exports.logic = functions.region("asia-south1").https.onRequest(app);

@@ -102,7 +102,10 @@ const HomePage: FC<HomeProps> = () => {
                     data: payload,
                   };
                   var response = await axios(config);
-                  history.push(`/lobby/${response.data.roomid}`);
+                  if (response.data === "No such document!") {
+                    window.alert("Please Check Room ID");
+                    setIsActive(false);
+                  } else history.push(`/lobby/${response.data.roomid}`);
                 })();
               }}
             >
