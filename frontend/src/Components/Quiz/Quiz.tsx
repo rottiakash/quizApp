@@ -95,6 +95,7 @@ const Quiz: FC = () => {
     option3: regularOption,
     option4: regularOption,
   });
+  const [disabled, setDisabled] = useState(false);
   const history = useHistory();
   const { id, qno } = useParams();
   const auth = useAuth();
@@ -152,6 +153,7 @@ const Quiz: FC = () => {
   var token: string;
   auth.currentUser?.getIdToken().then((idToken) => (token = idToken));
   const validate = async (answer: string, button: number) => {
+    setDisabled(true);
     if (button === 1)
       setOptionStyle({ ...optionStyle, option1: validateOption });
     else if (button === 2)
@@ -210,7 +212,7 @@ const Quiz: FC = () => {
 
     if (parseInt(qno) < 7) history.push(`/quiz/${id}/${parseInt(qno) + 1}`);
     else history.push(`/winner/${id}`);
-
+    setDisabled(false);
     setClock(21);
   };
   if (!other) return <Waiter />;
@@ -250,6 +252,7 @@ const Quiz: FC = () => {
           setClock={setClock}
           optionStyle={optionStyle}
           resetTimer={resetTimer}
+          disabled={disabled}
         />
 
         <div
@@ -341,6 +344,7 @@ interface QuestionProps {
     option3: any;
     option4: any;
   };
+  disabled: boolean;
 }
 interface Question {
   correct: string;
@@ -351,7 +355,7 @@ const Question: FC<QuestionProps> = ({
   topic,
   question,
   resetTimer,
-  setClock,
+  disabled,
   validate,
   optionStyle,
 }) => {
@@ -395,30 +399,34 @@ const Question: FC<QuestionProps> = ({
           gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
         }}
       >
-        <div
+        <button
+          disabled={disabled}
           onClick={() => validate(data.options[0], 1)}
           style={optionStyle.option1}
         >
           {data.options[0]}
-        </div>
-        <div
+        </button>
+        <button
+          disabled={disabled}
           onClick={() => validate(data.options[1], 2)}
           style={optionStyle.option2}
         >
           {data.options[1]}
-        </div>
-        <div
+        </button>
+        <button
+          disabled={disabled}
           onClick={() => validate(data.options[2], 3)}
           style={optionStyle.option3}
         >
           {data.options[2]}
-        </div>
-        <div
+        </button>
+        <button
+          disabled={disabled}
           onClick={() => validate(data.options[3], 4)}
           style={optionStyle.option4}
         >
           {data.options[3]}
-        </div>
+        </button>
       </section>
     </div>
   );
