@@ -168,7 +168,12 @@ exports.removeOldMessages = functions
     const messagesRef = await admin.firestore().collection("rooms").get();
     messagesRef.forEach((doc) => {
       if (doc.data().p1_w && doc.data().p2_w) {
-        admin.firestore().collection("rooms").doc(doc.id).delete();
+        admin
+          .firestore()
+          .collection("rooms")
+          .doc(doc.id)
+          .delete()
+          .catch((err) => console.log(err));
       }
     });
     return res.status(200).end();
