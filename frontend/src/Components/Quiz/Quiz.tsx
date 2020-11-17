@@ -251,7 +251,7 @@ const Quiz: FC = () => {
     setDisabled(false);
     setClock(21);
   };
-  if (!other) return <Waiter />;
+  if (!other) return <Waiter room={room} />;
   else
     return (
       <div

@@ -6,3 +6,14 @@
   color: transparent;
   font-size: 3rem;
 }
+
+
+.score {
+  background-color: red;
+  font-size: 2.2rem;
+  background-image: linear-gradient(45deg, #f3ec78, #af4261);
+  background-size: 100%;
+  background-repeat: repeat;
+  background-clip: text;
+  color: transparent;
+}
