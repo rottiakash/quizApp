@@ -1,5 +1,4 @@
 import React, { FC } from "react";
-import { Room } from "../../Components/Winner/Winner";
 import styles from "./Waiter.module.css";
 
 interface WaiterProps {
