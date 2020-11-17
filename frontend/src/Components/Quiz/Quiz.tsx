@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useAuth, useFirestore, useFirestoreDocData } from "reactfire";
+import ProgressBar from "../../Modules/ProgressBar/progressBar";
 import Waiter from "../../Modules/Waiter/Waiter";
 import styles from "./Quiz.module.css";
 const axios = require("axios").default;
@@ -280,18 +281,42 @@ const Quiz: FC = () => {
           />
           <span className={styles.name}>Question {qno}</span>
         </div>
-
-        <Question
-          topic={room.topic}
-          question={room.questions[qno - 1]}
-          validate={validate}
-          setClock={setClock}
-          optionStyle={optionStyle}
-          resetTimer={resetTimer}
-          disabled={disabled}
-          setQuestionData={setQuestionData}
-        />
-
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100vw",
+          }}
+        >
+          <div>
+            <ProgressBar
+              completed={(parseInt(room.player1_score) / 140) * 100}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Question
+              topic={room.topic}
+              question={room.questions[qno - 1]}
+              validate={validate}
+              setClock={setClock}
+              optionStyle={optionStyle}
+              resetTimer={resetTimer}
+              disabled={disabled}
+              setQuestionData={setQuestionData}
+            />
+          </div>
+          <div>
+            <ProgressBar
+              completed={(parseInt(room.player2_score) / 140) * 100}
+            />
+          </div>
+        </div>
         <div
           style={{
             display: "flex",
@@ -325,6 +350,7 @@ const Quiz: FC = () => {
           <span
             style={{
               marginRight: "5px",
+              marginTop: "13px",
               paddingTop: "10px",
               height: "50px",
               width: "50px",

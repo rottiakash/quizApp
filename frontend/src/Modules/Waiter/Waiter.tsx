@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import ProgressBar from "../ProgressBar/progressBar";
 import styles from "./Waiter.module.css";
 
 interface WaiterProps {
@@ -18,7 +19,29 @@ const Waiter: FC<WaiterProps> = ({ room }) => (
     }}
   >
     <div></div>
-    <div className={styles.text}>Waiting for other Player</div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        width: "100vw",
+      }}
+    >
+      <div>
+        <ProgressBar completed={(parseInt(room.player1_score) / 140) * 100} />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div className={styles.text}>Waiting for other Player</div>
+      </div>
+      <div>
+        <ProgressBar completed={(parseInt(room.player2_score) / 140) * 100} />
+      </div>
+    </div>
     <div
       style={{
         display: "flex",
