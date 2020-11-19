@@ -1,6 +1,7 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, Suspense, useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useAuth, useFirestore, useFirestoreDocData } from "reactfire";
+import Loader from "../../Modules/Loader/Loader";
 import ProgressBar from "../../Modules/ProgressBar/progressBar";
 import Waiter from "../../Modules/Waiter/Waiter";
 import styles from "./Quiz.module.css";
@@ -300,16 +301,18 @@ const Quiz: FC = () => {
               alignItems: "center",
             }}
           >
-            <Question
-              topic={room.topic}
-              question={room.questions[qno - 1]}
-              validate={validate}
-              setClock={setClock}
-              optionStyle={optionStyle}
-              resetTimer={resetTimer}
-              disabled={disabled}
-              setQuestionData={setQuestionData}
-            />
+            <Suspense fallback={<Loader />}>
+              <Question
+                topic={room.topic}
+                question={room.questions[qno - 1]}
+                validate={validate}
+                setClock={setClock}
+                optionStyle={optionStyle}
+                resetTimer={resetTimer}
+                disabled={disabled}
+                setQuestionData={setQuestionData}
+              />
+            </Suspense>
           </div>
           <div>
             <ProgressBar
